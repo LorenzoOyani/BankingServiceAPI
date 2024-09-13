@@ -1,12 +1,10 @@
 package org.example.bankingportal.payload;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Builder
 @Getter
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@Setter
 public class UserRegistrationRequest {
 
     private String name;

@@ -3,12 +3,15 @@ package org.example.bankingportal.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
 @Entity
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "account")
 public class Account {
     @Id
@@ -17,16 +20,25 @@ public class Account {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    private String accountNumber;
-    private String accountType;
-    private String accountStatus;
-    private int balance;
-    private int pin;
+    @Basic(optional = false)
+    @NotNull
+    @Column(unique = true)
+    String accountNumber;
+
+    @Basic(optional = false)
+    String accountType;
+
+
+    String accountStatus;
+
+
+    int balance;
+    int pin;
 
     @NotNull
-    @OneToOne
-    private User user;
-
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    User user;
 
 
 }
