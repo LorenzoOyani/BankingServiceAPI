@@ -10,7 +10,6 @@ import org.example.bankingportal.Util.BaseEntity;
 import org.hibernate.annotations.NaturalId;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -23,8 +22,8 @@ import java.util.Set;
 public class Role extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "role_seq", nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_seq")
+    @Column(name = "role_id", nullable = false)
     Long id;
 
     @Basic(optional = false)
@@ -40,12 +39,7 @@ public class Role extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "permissions", referencedColumnName = "id")
     )
     @ToString.Exclude
-    Set<Permissions> permissions;
-
-
-    public void setPermissions(List<Permissions> permissions) {
-        this.permissions = new HashSet<>(permissions);//empty list of permissions!
-    }
+    Set<Permissions> permissions = new HashSet<>();
 
     public boolean equals(Object other) {
         return other instanceof Role

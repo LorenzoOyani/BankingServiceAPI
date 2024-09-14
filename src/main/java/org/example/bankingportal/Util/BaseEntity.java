@@ -19,7 +19,6 @@ import java.util.Optional;
 
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @MappedSuperclass

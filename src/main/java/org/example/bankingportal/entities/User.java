@@ -5,13 +5,11 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import net.minidev.json.annotate.JsonIgnore;
 import org.example.bankingportal.Util.BaseEntity;
-import org.hibernate.annotations.NaturalId;
 
 import java.util.Set;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -24,12 +22,12 @@ public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_req")
-    @SequenceGenerator(name = "user_req", sequenceName = "user_req", allocationSize = 1)
+    @SequenceGenerator(name = "user_req", sequenceName = "user_req",  allocationSize = 1)
     @Column(name = "id", nullable = false)
     Long id;
 
     @Basic(optional = false)
-    @NaturalId
+
     String name;
 
     @Basic(optional = false)
@@ -47,8 +45,7 @@ public class User extends BaseEntity {
     @Basic(optional = false)
     String countryCode;
 
-    @OneToOne(mappedBy = "Account_.USER", cascade = {CascadeType.ALL})
-    @JoinColumn(name = "account_id")
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.ALL},  orphanRemoval = true)
     Account account;
 
     @ManyToMany
