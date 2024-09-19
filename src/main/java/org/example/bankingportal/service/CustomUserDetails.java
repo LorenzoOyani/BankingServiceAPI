@@ -1,11 +1,15 @@
 package org.example.bankingportal.service;
 
+import org.example.bankingportal.entities.Permissions;
+import org.example.bankingportal.entities.Role;
 import org.example.bankingportal.entities.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -17,11 +21,17 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getRoles().stream()
-                .flatMap(role -> role.getPermissions().stream())
-                .map(permission -> (GrantedAuthority) permission::getName)
-                .collect(Collectors.toSet());
+        Set<GrantedAuthority> authorities = new HashSet<>();
 
+        for (Role role : user.getRoles()) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+
+            for (Permissions permissions : role.getPermissions()) {
+                authorities.add(new SimpleGrantedAuthority(permissions.getName()));
+            }
+
+        }
+        return authorities;
     }
 
     @Override

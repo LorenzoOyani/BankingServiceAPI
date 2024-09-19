@@ -10,8 +10,8 @@ import java.util.Optional;
 
 @NonNullApi
 public class AuditorAwareImpl implements AuditorAware<String> {
-    @Override
 
+    @Override
     public Optional<String> getCurrentAuditor() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
@@ -19,7 +19,6 @@ public class AuditorAwareImpl implements AuditorAware<String> {
         } else {
             return Optional.empty();
         }
-
         Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails) {
             return Optional.of(((UserDetails) principal).getUsername());

@@ -1,7 +1,5 @@
 package org.example.bankingportal.Util;
 
-
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,13 +7,8 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.Instant;
-import java.util.Optional;
 
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -26,16 +19,16 @@ import java.util.Optional;
 public class BaseEntity {
 
 
-    @Column(name = "CREATEDAT", nullable = false)
+    @Column(name = "CREATED_AT", nullable = false)
     Instant createdAt;
 
-    @Column(name = "CREATEDBY", nullable = false)
+    @Column(name = "CREATED_BY", nullable = false)
     String createdBy;
 
-    @Column(name = "UPDATEDAT", nullable = false)
+    @Column(name = "UPDATED_AT", nullable = false)
     Instant updatedAt;
 
-    @Column(name = "UPDATEDBY", nullable = false)
+    @Column(name = "UPDATED_BY", nullable = false)
     String updatedBy;
 
 }
