@@ -1,0 +1,43 @@
+services:
+#
+  keycloak-export:
+    image:   quay.io/keycloak/keycloak:26.0.5
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    volumes:
+      - ./keycloak-export:/opt/keycloak/data
+    command: export --dir /opt/keycloak/data --realm my-realm
+
+
+  keycloak:
+        image: quay.io/keycloak/keycloak:26.0.5
+        environment:
+          - KEYCLOAK_ADMIN=admin
+          - KEYCLOAK_ADMIN_PASSWORD=admin
+        volumes:
+          - ./keycloak-export:/opt/keycloak/data
+        command: start-dev --import-realm
+
+
+
+
+
+
+
+  postgres:
+    image: postgres
+    container_name: my-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Admin
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
+

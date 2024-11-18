@@ -33,6 +33,7 @@ public class Account {
 
 
     int balance;
+
     int pin;
 
     @NotNull

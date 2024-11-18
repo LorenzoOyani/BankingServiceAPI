@@ -12,7 +12,7 @@ public class JwtSecretKey {
     private String secretKey;
 
     @Bean
-    public String  getSecretKey(){
+    public String getSecretKey(){
         return  SingleTonJwtSecretKey.INSTANCE.secretKey;
     }
 
