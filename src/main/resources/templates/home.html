@@ -1,12 +1,25 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
 </head>
 <body>
 <header>
-    <h1>Welcome,
-    <span th:text="${username}">Guest</span></h1>
+    <nav>
+        <p sec:authorize="!isAuthenticated()">
+            <a href="/oauth2/authorization/my-client">Login</a>
+        </p>
+    </nav>
 </header>
+
+<main>
+    <section>
+        <h1>Welcome, <span th:text="${username}">username</span></h1>
+    </section>
+</main>
 </body>
 </html>

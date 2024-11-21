@@ -12,7 +12,11 @@ import org.example.bankingportal.service.UserService;
 import org.example.bankingportal.service.UserServiceImpl;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
+
+import static com.nimbusds.jose.shaded.gson.internal.$Gson$Types.getRawType;
 
 @Slf4j
 @Aspect
@@ -28,7 +32,7 @@ public class Logging {
 
 
         UserService userService = new UserServiceImpl();
-        UserRegistrationRequest request  = new UserRegistrationRequest();
+        UserRegistrationRequest request = new UserRegistrationRequest();
         User user = userService.createUser(request);
 
         Object[] returnedArgs = {user};
@@ -54,4 +58,27 @@ public class Logging {
 //       var user =  context.createUser(request);
 //       log.info(user.toString());
 //    }
+
+    public static Class<?> comparableClassForObjects(Object x) {
+        if (x instanceof Comparable) {
+            Class<?> c;
+            Type[] ts, as;
+            ParameterizedType pt;
+            if ((c = x.getClass()) == String.class) {
+                return c;
+            }
+            if ((ts = c.getGenericInterfaces()) != null) {
+                for (Type t : ts) {
+                    if (t instanceof ParameterizedType &&
+                            ((pt = (ParameterizedType) t)).getRawType().equals(Comparable.class)
+                            && (as = pt.getActualTypeArguments()) != null
+                            && as.length == 1 && as[0] == c) {
+
+                        return c;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }

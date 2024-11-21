@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
+
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "org.example.bankingportal.repositories")
-@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 @EnableMethodSecurity
 public class BankingPortalApplication {
 
