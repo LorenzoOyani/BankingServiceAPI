@@ -26,21 +26,21 @@ public class KeyCloakAuthenticationConverter implements Converter<Jwt, AbstractA
             authorities.addAll(authorityList);
         }
 
-        return new JwtAuthenticationToken(jwt);
+        return new JwtAuthenticationToken(jwt); // the implemented contract define by this class
     }
 
     @SuppressWarnings("unchecked")
     private List<GrantedAuthority> extractJwtTokens(Jwt jwt) {
-        Map<String, Object> claims = jwt.hasClaim("claims") ? jwt.getClaims() : Collections.emptyMap(); // reduce the redundancy of an if statement check!
-        List<String> storedClaims = (List<String>) claims.get("claims");
-
-        if (storedClaims == null || storedClaims.isEmpty()) {
-            storedClaims = List.of("ROLE_ADMIN");
+        Map<String, Object> claims = (Map<String, Object>) jwt.getClaims().get("realm-claims");
+        if (claims == null || claims.isEmpty()) {
+            return List.of();
         }
-
-        return storedClaims.stream()
-                .filter(role -> role.startsWith("ROLE_"))
-                .map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-
+        List<String> role = (List<String>) claims.get("authorities");
+        if (role == null || role.isEmpty()) {
+            role = List.of("ROLE_USER");
+        }
+        return role.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
 }

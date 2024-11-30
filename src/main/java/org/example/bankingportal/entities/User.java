@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import net.minidev.json.annotate.JsonIgnore;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -13,10 +15,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "account_users",
-        uniqueConstraints
-                = @UniqueConstraint(columnNames = {"name", "password", "phone_number"})
-)
+@Table(name = "Bank_users")
 public class User{
 
     @Id
@@ -35,10 +34,11 @@ public class User{
     @Basic(optional = false)
     String password;
 
+    @Column(name = "email", unique = true)
     @Basic(optional = false)
     String email;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", unique = true)
     @Basic(optional = false)
     String phoneNumber;
 
@@ -48,11 +48,22 @@ public class User{
     @Basic(optional = false)
     String countryCode;
 
-    @OneToOne(mappedBy = "user", cascade = {CascadeType.ALL}, orphanRemoval = true)
-    Account account;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<Account> account = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     Role role;
+
+    public void addAccount(Account account) {
+        this.account.add(account);
+        account.setUser(this);
+    }
+
+    public void removeAccount(Account account) {
+        this.account.remove(account);
+        account.setUser(null);
+
+    }
 
 
 }

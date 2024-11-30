@@ -3,6 +3,7 @@ package org.example.bankingportal.configuration;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
+import org.example.bankingportal.Util.ServerAuthoritiesMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -50,6 +51,7 @@ public class Oauth2SecurityConfig {
     }
 
     @Bean
+    @Order(1)
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
     }
@@ -62,7 +64,11 @@ public class Oauth2SecurityConfig {
                                 .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .oauth2Login(Customizer.withDefaults())
+                .oauth2Login(login -> {
+                    login.userInfoEndpoint(userInfoEndpoint -> {
+                        userInfoEndpoint.userAuthoritiesMapper(new ServerAuthoritiesMapper());
+                    });
+                })
                 .logout(logout -> logout.clearAuthentication(true)
                         .invalidateHttpSession(true)
                         .logoutSuccessHandler(oidcLogoutSuccessHandler())
@@ -75,7 +81,8 @@ public class Oauth2SecurityConfig {
 
     @Bean
     public LogoutSuccessHandler oidcLogoutSuccessHandler() {
-        OidcClientInitiatedLogoutSuccessHandler logoutSuccessHandler = new OidcClientInitiatedLogoutSuccessHandler(this.clientRegistrationRepository);
+        OidcClientInitiatedLogoutSuccessHandler logoutSuccessHandler =
+                new OidcClientInitiatedLogoutSuccessHandler(this.clientRegistrationRepository);
         logoutSuccessHandler.setPostLogoutRedirectUri("http://localhost:8080/login/logout");
         return logoutSuccessHandler;
     }

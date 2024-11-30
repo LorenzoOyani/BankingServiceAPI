@@ -5,75 +5,78 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
+import org.example.bankingportal.Exception.UserAlreadyExistException;
 import org.example.bankingportal.Util.EmailValidator;
 import org.example.bankingportal.Util.PasswordValidator;
 import org.example.bankingportal.aop.ToLog;
 import org.example.bankingportal.entities.User;
+import org.example.bankingportal.mapper.UserMapper;
 import org.example.bankingportal.payload.UserRegistrationRequest;
+import org.example.bankingportal.payload.UserResponse;
 import org.example.bankingportal.repositories.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Log4j2
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private  UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    public UserServiceImpl(){};
+    private final PasswordEncoder passwordEncoder;
 
-    @Override
-    public User createUser(UserRegistrationRequest user) {
-        Objects.requireNonNull(user);
-        User newUser = new User();
-        String[] names = user.getName().split(" ", 2);
-        newUser.setFirstName(names[0]);
-        newUser.setLastName(names.length > 1 ? names[1] : "");
-        newUser.setEmail(user.getEmail());
-        newUser.setPassword(user.getPassword());
-        newUser.setCountryCode(user.getCountryCode());
+    private final UserMapper userMapper;
 
-        return userRepository.save(newUser);
-
-    }
 
     @Override
-    public User findUserByEmail(String email) {
-        if (!EmailValidator.isValidEmail(email) && !userRepository.existsUserByEmail(email)) {
-            return null;
+    public UserResponse createUser(UserRegistrationRequest userRequest) {
+        Objects.requireNonNull(userRequest, "userRequest can't be null");
+
+        log.info("Creating user...");
+        if (existByEmail(userRequest)) {
+            log.warn("user with {} already exists", userRequest.getEmail());
+            throw new UserAlreadyExistException("user already exists");
         }
-        return userRepository.findByEmail(email);
+        User user = userMapper.toUser(userRequest);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        userRepository.save(user);
+
+        return userMapper.toUserResponse(user);
+
+    }
+
+    private boolean existByEmail(UserRegistrationRequest userRequest) {
+        String emails = userRequest.getEmail();
+        return userRepository.existsUserByEmail(emails);
     }
 
     @Override
-    public User findUserByEmailAndPassword(String email, String password) {
-        return null;
+    public Optional<UserResponse> findUserByEmail(String email) {
+        User user = userRepository.findUserByEmail(email)
+                .stream().findFirst().orElse(null);
+
+        return Optional.ofNullable(userMapper.toUserResponse(user));
     }
 
-    @ToLog
-    @Transactional
+//    @Override
+//    public Optional<User> authenticateUser(String email, String password) {
+//
+//        return Optional.empty();
+//    }
+
     @Override
     public void updateUser(long id, User user) {
-        User user1 = userRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.info("user with id, {} , not in database" , id);
-                    return new RuntimeException("failed to find user with id, " + id);
-                });
-        user1.setFirstName(user.getFirstName());
-        user1.setLastName(user.getLastName());
-        user1.setEmail(user.getEmail());
-        user1.setPassword(user.getPassword());
-        user1.setCountryCode(user.getCountryCode());
-        userRepository.save(user1);
+
     }
 
-    @Transactional
     @Override
-    public void deleteUser(long id, User user) {
-        User user1 = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public void deleteUserById(long id) {
 
-        userRepository.delete(user1);
     }
 }

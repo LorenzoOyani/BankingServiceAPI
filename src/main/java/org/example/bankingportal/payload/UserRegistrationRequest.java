@@ -14,11 +14,17 @@ import org.example.bankingportal.Util.ValidEmail;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRegistrationRequest {
+public class  UserRegistrationRequest {
 
     @Valid
     @Size(min = 1, max = 50)
-    String name;
+    String firstname;
+
+
+    @Valid
+    @Size(min = 1, max = 50)
+    String lastname;
+
 
     @ValidEmail
     @Size(min = 1, max = 50)
@@ -28,8 +34,7 @@ public class UserRegistrationRequest {
     String password;
 
     @NotNull
-    String address;
+    String username;
 
-    @NotNull
-    String countryCode;
+
 }

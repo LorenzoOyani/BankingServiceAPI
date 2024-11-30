@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+
 @RestController
 public class MessagesLab {
     private final static AtomicLong counter = new AtomicLong(0L);

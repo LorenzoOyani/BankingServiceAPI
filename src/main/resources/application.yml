@@ -1,5 +1,5 @@
 server:
-  port: 8081 # Replace with your application's port if needed
+  port: 8089 # Replace with your application's port if needed
 
 spring:
   security:

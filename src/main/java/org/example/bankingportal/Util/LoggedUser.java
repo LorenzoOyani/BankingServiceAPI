@@ -36,7 +36,7 @@ public class LoggedUser {
         Map<String, Object> realms = (Map<String, Object>) jwt.getClaims().get("real-user");
         if (realms != null && !realms.isEmpty()) {
             for (String s : (List<String>) realms.get("realm-users")) {
-                return List.of(s);
+                return List.of(s); //Immutable list!
             }
 
         }

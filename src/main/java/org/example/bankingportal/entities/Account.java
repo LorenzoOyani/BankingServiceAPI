@@ -7,16 +7,21 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
-@Entity
+@Entity(name = "Account")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "account")
+@Table(name = "Account")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_seq")
-    @SequenceGenerator(name = "account_seq")
+    @SequenceGenerator(name = "account_seq", sequenceName = "account_sequence", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -28,18 +33,33 @@ public class Account {
     @Basic(optional = false)
     String accountType;
 
-
     String accountStatus;
 
 
-    int balance;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
 
-    int pin;
-
-    @NotNull
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    User user;
+    // recommended  equals and hashCode implementation in child entity
 
 
+    // the account number is unique for each user
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+
+        Account other = (Account) obj;
+        EqualsBuilder equalsBuilder = new EqualsBuilder();
+        equalsBuilder.append(this.getAccountNumber(), other.getAccountNumber());
+
+        return equalsBuilder.isEquals();
+    }
+
+
+    @Override
+    public int hashCode() {
+        HashCodeBuilder hashBuilder = new HashCodeBuilder();
+        hashBuilder.append(accountNumber);
+        return hashBuilder.toHashCode();
+    }
 }
