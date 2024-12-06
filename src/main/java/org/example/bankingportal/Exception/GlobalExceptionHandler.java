@@ -1,6 +1,7 @@
 package org.example.bankingportal.Exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +28,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse(ex), HttpStatus.BAD_REQUEST);
 
     }
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handleBadRequestException(Exception ex, WebRequest request) throws RuntimeException {
+        log.warn("{}, {}", request.getContextPath(), ex.getMessage());
+        return  ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ex.getMessage());
+    }
 
     private ErrorResponse errorResponse(Throwable ex) {
         return new ErrorResponse(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleMethodValidationException(MethodArgumentNotValidException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleMethodValidationException(MethodArgumentNotValidException ex, WebRequest request) {
         Map<String, String> errors = new HashMap<>();
 
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -42,7 +50,8 @@ public class GlobalExceptionHandler {
             errors.put(fieldError, errorMessage);
         });
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorResponse(errors.get(ex.getMessage())),
+                HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserAlreadyExistException.class)

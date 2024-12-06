@@ -1,9 +1,12 @@
 package org.example.bankingportal.service;
 
 import org.example.bankingportal.entities.User;
+import org.example.bankingportal.payload.UserDTO;
 import org.example.bankingportal.payload.UserRegistrationRequest;
 import org.example.bankingportal.payload.UserResponse;
+import org.springframework.http.ResponseEntity;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -19,12 +22,19 @@ public interface UserService {
      */
     UserResponse createUser(UserRegistrationRequest userRequest);
 
+
+    User getUser(Map<String, Object> users);
+
+
+    ResponseEntity<UserDTO> getUserById(Long id);
+
     /**
      * Finds a user by their email.
      *
      * @param email the email of the user
      * @return an Optional containing the user, if found
      */
+
     Optional<UserResponse> findUserByEmail(String email);
 
     /**
@@ -42,7 +52,7 @@ public interface UserService {
      * @param id   the ID of the user to update
      * @param user the updated user details
      */
-    void updateUser(long id, User user);
+    void updateUser(long id, UserRegistrationRequest user);
 
     /**
      * Deletes a user by their ID.

@@ -5,8 +5,10 @@ import lombok.Setter;
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 import org.example.bankingportal.Util.ConcurrentHashMap;
+import org.example.bankingportal.configuration.ApplicationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -19,6 +21,7 @@ import java.util.function.Consumer;
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "org.example.bankingportal.repositories")
 @EnableMethodSecurity
+@EnableConfigurationProperties(value = ApplicationProperties.class)
 public class BankingPortalApplication {
 
 
@@ -84,11 +87,15 @@ public class BankingPortalApplication {
         public synchronized Map<String, MutablePoint> getLocations() {
             return locations;
         }
+
         public void setLocation(String id, int x, int y) {
             if (!locations.containsKey(id))
                 throw new IllegalArgumentException(
                         "invalid vehicle name: " + id);
-            locations.get(id).set(x, y);
+            MutablePoint l = locations.get(id);
+            for(Map.Entry<String, MutablePoint> entry : vehicles.entrySet()){
+                entry.setValue(new MutablePoint(l.x, l.y));
+            }
         }
 
         public synchronized void setLocations(String id, int x, int y) {
@@ -144,7 +151,25 @@ public class BankingPortalApplication {
 
     }
 
-    ;
+    public static class HiddenClass{
+        Set<Integer> newSets = new HashSet<>();
+
+        public void setValue(int value) {
+            newSets.add(value);
+        }
+
+        public void remove(int value) {
+            this.newSets.remove(value);
+        }
+        public void addNewRandomValues(){
+            Random r = new Random();
+            for(int i = 0; i < 10; i++){
+                this.setValue(r.nextInt());
+            }
+        }
+    }
+
+
 }
 
 

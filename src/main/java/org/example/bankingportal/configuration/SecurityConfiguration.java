@@ -28,7 +28,7 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(3)
-    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+    public SecurityFilterChain configures(HttpSecurity http) throws Exception {
 
         http.authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.requestMatchers(HttpMethod.GET, "/messages").permitAll()

@@ -1,44 +1,55 @@
 package org.example.bankingportal.service;
 
 import org.example.bankingportal.entities.Account;
+import org.example.bankingportal.payload.AccountDTO;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 public interface AccountService {
 
     /**
-     * Creates a new account.
+     * Creates a new account for a user.
      *
-     * @param account The account to create.
+     * @param accountDTO   The  account DTO for separation of concern.
+
      * @return The created account.
      */
-    Account createAccount(Account account);
+    Account createAccount(AccountDTO accountDTO);
 
     /**
-     * Retrieves an account by its ID.
+     * Finds an account by its unique account number.
      *
-     * @param accountId The ID of the account to retrieve.
-     * @return An Optional containing the account if found, or empty if not.
+     * @param accountId The accountId to search for.
+     * @return The account with the given account number, or null if not found.
      */
-    Optional<Account> getAccountById(Long accountId);
+    AccountDTO findByAccountId(long accountId);
 
     /**
-     * Retrieves all accounts for a specific user.
+     * Retrieves all accounts associated with a user.
      *
-     * @param userId The ID of the user whose accounts are to be retrieved.
+     * @param userId The ID of the user.
      * @return A list of accounts belonging to the user.
      */
-    List<Account> getAccountsByUserId(Long userId);
+    List<AccountDTO> findAccountsByUserId(Long userId);
 
     /**
-     * Updates the details of an existing account.
+     * Updates the status of an account.
      *
      * @param accountId The ID of the account to update.
-     * @param updatedAccount The updated account details.
+     * @param status    The new status to set.
      * @return The updated account.
      */
-    Account updateAccount(Long accountId, Account updatedAccount);
+    Account updateAccountStatus(Long accountId, String status);
+
+    /**
+     * Updates the available balance of an account.
+     *
+     * @param accountId The ID of the account.
+     * @param amount    The amount to update the balance by.
+     * @return The updated account.
+     */
+    Account updateAccountBalance(Long accountId, BigDecimal amount);
 
     /**
      * Deletes an account by its ID.
@@ -47,37 +58,14 @@ public interface AccountService {
      */
     void deleteAccount(Long accountId);
 
-    /**
-     * Retrieves an account by its account number.
-     *
-     * @param accountNumber The unique account number.
-     * @return An Optional containing the account if found, or empty if not.
-     */
-    Optional<Account> getAccountByAccountNumber(String accountNumber);
+
 
     /**
-     * Retrieves all accounts with a specific status.
+     * Closes the account with the specified account number.
      *
-     * @param status The account status to filter by.
-     * @return A list of accounts with the specified status.
+     * @param accountNumber The account number of the account to be closed.
+     * @return The response indicating the result of the account closure.
      */
-    List<Account> getAccountsByStatus(String status);
+    Account closeAccount(String accountNumber);
 
-//    /**
-//     * Deactivates an account by its ID.
-//     *
-//     * @param accountId The ID of the account to deactivate.
-//     * @return The deactivated account.
-//     */
-//    Account deactivateAccount(Long accountId);
-//
-//    /**
-//     * Transfers funds between two accounts.
-//     *
-//     * @param fromAccountId The ID of the account to transfer funds from.
-//     * @param toAccountId The ID of the account to transfer funds to.
-//     * @param amount The amount to transfer.
-//     * @return True if the transfer was successful, false otherwise.
-//     */
-//    boolean transferFunds(Long fromAccountId, Long toAccountId, double amount);
 }

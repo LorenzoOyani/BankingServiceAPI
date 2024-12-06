@@ -1,6 +1,7 @@
 package org.example.bankingportal.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -10,14 +11,13 @@ import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
 @Entity(name = "Account")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "Account")
+@Table(name = "account_id")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_seq")
@@ -27,22 +27,21 @@ public class Account {
 
     @Basic(optional = false)
     @NotNull
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     String accountNumber;
 
-    @Basic(optional = false)
-    String accountType;
+    @Enumerated(EnumType.STRING)
+    AccountType accountType;
 
-    String accountStatus;
-
+    @Enumerated(EnumType.STRING)
+    AccountStatus accountStatus;
+    BigDecimal availableBalance;
+    String pin;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    // recommended  equals and hashCode implementation in child entity
-
-
-    // the account number is unique for each user
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -51,11 +50,8 @@ public class Account {
         Account other = (Account) obj;
         EqualsBuilder equalsBuilder = new EqualsBuilder();
         equalsBuilder.append(this.getAccountNumber(), other.getAccountNumber());
-
         return equalsBuilder.isEquals();
     }
-
-
     @Override
     public int hashCode() {
         HashCodeBuilder hashBuilder = new HashCodeBuilder();

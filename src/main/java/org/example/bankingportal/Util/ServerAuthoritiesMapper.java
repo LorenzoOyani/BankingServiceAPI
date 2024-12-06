@@ -36,12 +36,9 @@ public class ServerAuthoritiesMapper implements GrantedAuthoritiesMapper {
         Map<String, Object> claimsMap = (Map<String, Object>) claims.get("claims");
         if (claimsMap != null && !claimsMap.isEmpty()) {
             List<String> authValues = (List<String>) claimsMap.get("claims");
-            var valueList = authValues.stream()
-                    .filter(role -> role.startsWith("ROLE_"))
+            authValues.stream()
+                    .filter(roles -> roles.startsWith("ROLE_"))
                     .map(SimpleGrantedAuthority::new)
-                    .toList();
-
-            grantedAuthorities.addAll(valueList);
-        }
+                    .forEach(grantedAuthorities::add);}
     }
 }

@@ -1,10 +1,12 @@
 package org.example.bankingportal.Exception;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,14 +15,15 @@ import java.util.List;
 public class ErrorResponse {
 
 
-    private final Instant instant;
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern = "dd-mm-yy")
+    private final LocalDateTime instant;
 
-    private List<String>  messages;
+    private final List<String>  messages;
 
 
     public ErrorResponse(String message) {
         this.messages = new ArrayList<>();
         this.messages.add(message);
-        this.instant = Instant.now();
+        this.instant = getInstant(); //events occur in real-time
     }
 }

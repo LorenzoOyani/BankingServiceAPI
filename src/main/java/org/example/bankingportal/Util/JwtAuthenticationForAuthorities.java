@@ -82,43 +82,64 @@ public class JwtAuthenticationForAuthorities<T> implements Converter<Jwt, Collec
         for (int i = 0; i < array.length; i++) {
             arr[i] = (T) new ArrayList<>((Collection<T>) array[i]);
         }
+
         if (array.length > arr.length) {
             return array;
         }
+
         System.arraycopy(array, 0, arr, 0, array.length);
         if (arr.length > array.length) {
             arr[array.length] = null;
-
         }
+
+
         return arr;
+    }
+
+    public <T> T elementAt(T[] arr, int index) {
+        return arr[index];
+    }
+
+    @SuppressWarnings("unchecked")
+    public T[] getArray() {
+        return (T[]) this.objects;
+    }
+
+    public void insertAtIndex(int index, T element) {
+        T[] array = this.getArray(); // get the specified array
+        T oldValue = this.elementAt(array, index);
+
+        if (oldValue != null) {
+            array = array.clone();
+            array[index] = oldValue;
+        }
+        array[index] = element;
+
+
     }
 
     //copyOnWrite exercise
 
+    @SuppressWarnings("unchecked")
     public void add(int index, T element) {
-        synchronized (lock) { //intrinsic locking!
-            Object[] es = this.getArray();
-            int len = es.length;
-            if (index > len || index < 0) { // method invariants and pre-conditions.
-                throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + len);
+        synchronized (this.lock) {
+            T[] array = this.getArray();
+            int length = array.length;
+            T[] elements;
+            if (index > length || index < 0) {
+                throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + length);
             }
-            Object[] newElement;
-            int movedElem = len - index;
-            if (movedElem == 0) {
-                newElement = Arrays.copyOf(es, len + 1);
+            int arrLen = length - index;
+            if (arrLen == 0) {
+                elements = Arrays.copyOf(array, length + 1);
             } else {
-                newElement = new Object[len + 1];
-                System.arraycopy(es, 0, newElement, 0, index);
-                System.arraycopy(es, 0, newElement, index + 1, movedElem);
+                elements = (T[]) new Object[length + 1];
+                System.arraycopy(array, 0, elements, 0, index); // first array index
+                System.arraycopy(array, index, elements, index + 1, arrLen);
+
             }
-            newElement[index] = element; //copy new element at the specified index!
-            setObjects(newElement); // update object state
-
+            elements[index] = element;
         }
-    }
-
-    private Object[] getArray() {
-        return this.objects;
     }
 
 

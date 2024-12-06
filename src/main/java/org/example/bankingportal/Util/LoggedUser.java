@@ -1,5 +1,6 @@
 package org.example.bankingportal.Util;
 
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -16,7 +17,7 @@ public class LoggedUser {
 
     public Map<String, Object> getLoggedInUsers() {
         Map<String, Object> loggedUsers = new ConcurrentHashMap<>();
-        JwtAuthenticationToken authenticationToken =
+        AbstractAuthenticationToken authenticationToken =
                 (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         Jwt jwt = (Jwt) authenticationToken.getPrincipal();

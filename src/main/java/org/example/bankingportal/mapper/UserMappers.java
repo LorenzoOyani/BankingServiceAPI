@@ -4,8 +4,10 @@ import org.example.bankingportal.Util.BaseEntity;
 import org.example.bankingportal.entities.User;
 import org.example.bankingportal.payload.UserDTO;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+@Component
 public class UserMappers extends BaseEntity<UserDTO, User> {
     @Override
     public User convertToEntity(UserDTO userDTO, Object... args) {

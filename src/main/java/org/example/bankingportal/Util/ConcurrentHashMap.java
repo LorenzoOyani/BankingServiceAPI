@@ -45,13 +45,14 @@ public interface ConcurrentHashMap<K, V> extends Map<K, V> {
     }
 
     default boolean replace(K key, V oldValue, V newValue) {
-        Object currVal = this.get(key);
-        if (!Objects.equals(currVal, oldValue) ||
-                currVal == null && !containsKey(key)) { //all the bad-things that could happen here...
-            return false;
-        }
-        put(key, newValue);
-        return true;
+       Object currVal = this.get(key);
+       if(Objects.equals(currVal, oldValue) ||
+       currVal == null && !containsKey(key)
+       ) {
+           return false;
+       }
+       this.put(key, newValue);
+       return true;
     }
 
     default V computeIfAbsent(K key, @NonNull Function<? super K, ? extends V> mappingFunction) {
@@ -61,7 +62,7 @@ public interface ConcurrentHashMap<K, V> extends Map<K, V> {
             V newValue;
             if ((newValue = mappingFunction.apply(key)) != null) {
                 this.put(key, newValue);
-                return newValue;
+                return newValue; // recomputed!
             }
         }
         return v;
@@ -69,17 +70,16 @@ public interface ConcurrentHashMap<K, V> extends Map<K, V> {
 
     default V compute(K key, @NonNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
         Objects.requireNonNull(remappingFunction);
-        V oldValue = this.get(key); // a non-null entry used for mappings
-        V newValue = remappingFunction.apply(key, oldValue);
-
-        if(newValue == null) { //if-present
-            if(oldValue != null || containsKey(key)) {
+        V v;
+        v = this.get(key);
+        V newValue = remappingFunction.apply(key, v);
+        if (newValue == null) {
+            if (v != null) {
                 this.remove(key);
             }
             return null;
-        }else{ // else..
-            this.put(key, newValue);
-            return newValue;
         }
+        this.put(key, newValue);
+        return newValue;
     }
 }
