@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.example.bankingportal.Exception.ResourceNotFoundException;
 import org.example.bankingportal.Util.AccountNumberGenerator;
 import org.example.bankingportal.entities.Account;
+import org.example.bankingportal.entities.AccountStatus;
 import org.example.bankingportal.entities.User;
 import org.example.bankingportal.mapper.AccountMapper;
 import org.example.bankingportal.mapper.UserMappers;
@@ -74,8 +75,18 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account updateAccountStatus(Long accountId, String status) {
+        return accountRepository.findAccountById(accountId)
+                .map(account -> {
+                    if (!account.getAccountStatus().equals(AccountStatus.ACTIVE)) {
+                        throw new ResourceNotFoundException("account not activated");
+                    }
 
-        return null;
+                    if (account.getAvailableBalance().compareTo(BigDecimal.ZERO) < 0 || account.getAvailableBalance().compareTo(BigDecimal.valueOf(1000)) < 0) {
+                        throw new RuntimeException("insufficient balance");
+                    }
+                    account.setAccountStatus(AccountStatus.valueOf(status));
+                    return accountRepository.save(account);
+                }).orElseThrow(() -> new RuntimeException("account not found in server"));
 
     }
 
@@ -91,6 +102,20 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account closeAccount(String accountNumber) {
-        return null;
+        return accountRepository.findAccountByAccountNumber(accountNumber)
+                .map(account -> {
+                    if (BigDecimal.valueOf(Double.parseDouble(getBalance(accountNumber))).compareTo(BigDecimal.ZERO) != 0) {
+                        throw new RuntimeException("Account needs to be zero");
+                    }
+
+                    account.setAccountStatus(AccountStatus.CLOSED);
+                    return account;
+                }).orElseThrow(() -> new RuntimeException("account not found in server"));
+
+    }
+
+    private String getBalance(String accountNumber) {
+        return accountRepository.findAccountByAccountNumber(accountNumber)
+                .map(account -> account.getAvailableBalance().toString()).orElseThrow(() -> new RuntimeException("zero balance"));
     }
 }
