@@ -36,10 +36,8 @@ public class LoggedUser {
     private List<String> getRoles(Jwt jwt) {
         Map<String, Object> realms = (Map<String, Object>) jwt.getClaims().get("real-user");
         if (realms != null && !realms.isEmpty()) {
-            for (String s : (List<String>) realms.get("realm-users")) {
-                return List.of(s); //Immutable list!
-            }
-
+           List<String> roles = (List<String>) realms.get("name");
+           return roles != null? List.copyOf(roles) : Collections.EMPTY_LIST;
         }
         return List.of();
     }

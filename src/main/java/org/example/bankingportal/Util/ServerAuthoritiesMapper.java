@@ -12,14 +12,14 @@ import java.util.*;
 public class ServerAuthoritiesMapper implements GrantedAuthoritiesMapper {
     @Override
     public Collection<? extends GrantedAuthority> mapAuthorities(Collection<? extends GrantedAuthority> authorities) {
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<>(); //immutable set collections
         for (GrantedAuthority authority : authorities) {
             if (authority instanceof SimpleGrantedAuthority) {
                 grantedAuthorities.add(authority);
             } else if (authority instanceof OidcUserAuthority oidcUserAuthority) {
                 OidcIdToken oidcIdToken = oidcUserAuthority.getIdToken();
                 Map<String, Object> claims = oidcIdToken.getClaims();
-                processClaims(grantedAuthorities, claims);
+                processClaims(grantedAuthorities, claims); //process claims one at a time.
             } else {
                 if (authority instanceof OAuth2UserAuthority oAuth2UserAuthority) {
                     Map<String, Object> claims = oAuth2UserAuthority.getAttributes();

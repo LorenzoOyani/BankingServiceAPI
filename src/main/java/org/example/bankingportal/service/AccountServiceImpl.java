@@ -1,10 +1,12 @@
 package org.example.bankingportal.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.example.bankingportal.Exception.ResourceNotFoundException;
 import org.example.bankingportal.Util.AccountNumberGenerator;
 import org.example.bankingportal.entities.Account;
 import org.example.bankingportal.entities.AccountStatus;
+import org.example.bankingportal.entities.AccountType;
 import org.example.bankingportal.entities.User;
 import org.example.bankingportal.mapper.AccountMapper;
 import org.example.bankingportal.mapper.UserMappers;
@@ -20,24 +22,31 @@ import org.springframework.util.ObjectUtils;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Log4j2
 @Service
 @AllArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
-    private final UserRepository userRepository;
 
     private final UserService userService;
+
     private final AccountMapper accountMapper;
-    private final UserMappers userMappers;
 
     @Override
     public Account createAccount(AccountDTO account) {
 
         ResponseEntity<UserDTO> users = userService.getUserById(account.getId());
-        if (ObjectUtils.isEmpty(users.getBody())) {
+        if (ObjectUtils.isEmpty(users.getBody())) { // for logging and debugging
             throw new UsernameNotFoundException("user not found");
         }
+
+        accountRepository.findAccountByIdAndAccountType(account.getId(), AccountType.valueOf(account.getAccountType().toString()))
+                .ifPresent(account1 -> {
+                    log.info("account already exists");
+                    throw new ResourceNotFoundException("account already exists");
+                });
+
         String accountNumber;
         do {
             accountNumber = AccountNumberGenerator.generateAccountNumber();
@@ -62,6 +71,21 @@ public class AccountServiceImpl implements AccountService {
                 .map(accountMapper::convertFromEntity)
                 .orElseThrow(() -> new ResourceNotFoundException("user not in the server!"));
     }
+
+
+    public AccountDTO readAccountById(Long userId) {
+        return accountRepository.findAccountById(userId)
+                .map(account -> {
+                   if(!account.getAccountStatus().equals(AccountStatus.ACTIVE)) {
+                       throw new ResourceNotFoundException("account not activated");
+                   }
+                   AccountDTO dbAccount = this.accountMapper.convertFromEntity(account);
+                   dbAccount.setAccountStatus(account.getAccountStatus());
+                   dbAccount.setAccountType(account.getAccountType());
+                   return dbAccount;
+                }).orElseThrow(() -> new ResourceNotFoundException("user not in the server!"));
+    }
+
 
 
     @Override
